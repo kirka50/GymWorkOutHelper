@@ -3,6 +3,7 @@ import LatestTrain from "@/pages/LatestTrain.tsx";
 import CreateTrain from "@/pages/CreateTrain.tsx";
 
 
+
 function AppRoutes() {
     return (
         <Routes>

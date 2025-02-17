@@ -7,26 +7,45 @@ interface TrainCardProps {
     train: ITrain;
 }
 
-function TrainCard({train}:TrainCardProps) {
-    return(
+
+
+
+function TrainCard({train}: TrainCardProps) {
+
+    const showAvainableStations = () => {
+        if (train.stationList) {
+            return (
+                <>
+                    <Separator/>
+                    <CardContent>
+                        {train.stationList?.map((station, id) => {
+                            return (
+                                <TrainStation key={id} station={station}/>
+                            )
+                        })}
+                    </CardContent>
+                    <Separator/>
+                </>
+            )
+        }
+    }
+
+    return (
         <Card className={'mx-2'}>
             <CardHeader>
-                <CardTitle>Последняя тренировка</CardTitle>
-                <CardDescription>Тренировка от {train.date}</CardDescription>
+                <CardTitle> Тренировка от {train.date}</CardTitle>
+                <CardDescription>Тренировка с id: {train.id}</CardDescription>
                 <div className={'flex gap-2 flex-nowrap overflow-hidden col-end-3'}>
                     <div>Cтатус: {train.status}</div>
                     <div>Оплатил: {train.payedBy}</div>
                     <div>Тип: {train.type}</div>
                 </div>
             </CardHeader>
-            <Separator/>
             <CardContent>
-                {train.stationList?.map((station, id) => {
-                    return <TrainStation key={id} station={station}/>
-                })}
+                {showAvainableStations()}
             </CardContent>
-            <Separator/>
             <CardFooter>
+
             </CardFooter>
         </Card>
     )

@@ -1,5 +1,5 @@
 interface ITrain {
-    id: string;
+    id?: string;
     date: string;
     type: "solo" | "split";
     payedBy?: string;
