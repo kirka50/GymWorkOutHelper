@@ -17,6 +17,18 @@ export class TrainDB extends Dexie{
             this.trainItem.toArray()
         })
     }
+
+    async setTrainFinished(id: string) {
+        return this.transaction('rw', this.trainItem, async () => {
+            return this.trainItem.update(Number(id), {status: "finished"});
+        })
+    }
+
+    async addTrain(train: ITrain) {
+        return this.transaction('rw', this.trainItem, async () => {
+            return this.trainItem.add(train);
+        });
+    }
 }
 
 export const db = new TrainDB();

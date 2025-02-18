@@ -20,8 +20,15 @@ function LatestTrain(
         getLastItem();
     }, []);
 
-
-
+    const refreshTrain = async (id: string) => {
+        try {
+            const item = await db.trainItem.get(Number(id));
+            console.log('refreshTrain', item);
+            setLatestTrain(item);
+        } catch (error) {
+            console.error('Ошибка при получении первого элемента:', error);
+        }
+    }
 
     return(
         <div>
@@ -40,7 +47,7 @@ function LatestTrain(
             </div>
             <div className={'mt-5 p-2'}>
                 {latestTrain ? (
-                    <Traincard train={latestTrain} />
+                    <Traincard train={latestTrain} refreshTrain={refreshTrain} />
                 ) : (<p>Не удалось получить последнюю тренировку</p>)}
             </div>
         </div>
