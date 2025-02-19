@@ -1,5 +1,5 @@
 interface ITrain {
-    id?: string;
+    id?: number;
     date: string;
     type: "solo" | "split";
     payedBy?: string;
@@ -8,6 +8,7 @@ interface ITrain {
 }
 
 interface ITrainStation {
+    personName: string;
     stationName: string;
     weight: string;
     repeats: number;

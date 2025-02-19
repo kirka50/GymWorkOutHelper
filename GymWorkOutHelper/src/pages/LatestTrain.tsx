@@ -7,28 +7,23 @@ import {db} from "@/models/TrainDB.ts";
 
 function LatestTrain(
 ) {
-    const [latestTrain, setLatestTrain] = useState<ITrain>();
-    useEffect(() => {
-        const getLastItem = async () => {
-            try {
-                const item = await db.trainItem.toCollection().last();
-                setLatestTrain(item);
-            } catch (error) {
-                console.error('Ошибка при получении первого элемента:', error);
-            }
-        };
-        getLastItem();
-    }, []);
 
-    const refreshTrain = async (id: string) => {
+
+    const [latestTrain, setLatestTrain] = useState<ITrain>();
+
+    const getLastItem = async () => {
         try {
-            const item = await db.trainItem.get(Number(id));
-            console.log('refreshTrain', item);
+            const item = await db.trainItem.toCollection().last();
             setLatestTrain(item);
         } catch (error) {
             console.error('Ошибка при получении первого элемента:', error);
         }
-    }
+    };
+
+    useEffect(() => {
+        getLastItem();
+    }, []);
+
 
     return(
         <div>
@@ -47,7 +42,7 @@ function LatestTrain(
             </div>
             <div className={'mt-5 p-2'}>
                 {latestTrain ? (
-                    <Traincard train={latestTrain} refreshTrain={refreshTrain} />
+                    <Traincard train={latestTrain}/>
                 ) : (<p>Не удалось получить последнюю тренировку</p>)}
             </div>
         </div>

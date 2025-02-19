@@ -18,9 +18,9 @@ export class TrainDB extends Dexie{
         })
     }
 
-    async setTrainFinished(id: string) {
+    async setTrainFinished(id: number) {
         return this.transaction('rw', this.trainItem, async () => {
-            return this.trainItem.update(Number(id), {status: "finished"});
+            return this.trainItem.update(id, {status: "finished"});
         })
     }
 
@@ -28,6 +28,12 @@ export class TrainDB extends Dexie{
         return this.transaction('rw', this.trainItem, async () => {
             return this.trainItem.add(train);
         });
+    }
+
+    async setPayer(id: number, payer: string) {
+        return this.transaction('rw', this.trainItem, async () => {
+            return this.trainItem.update(id, {payedBy: payer});
+        })
     }
 }
 
