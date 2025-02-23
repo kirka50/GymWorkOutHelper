@@ -1,11 +1,10 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
-import {ITrain} from "@/models/Train.model.ts";
+import {ITrain, ITrainStation} from "@/models/Train.model.ts";
 import TrainStation from "@/components/cs/TrainStation.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {db} from "@/models/TrainDB.ts";
 import {useState} from "react";
-import {Input} from "@/components/ui/input.tsx";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -16,15 +15,115 @@ import {
     AlertDialogCancel,
     AlertDialogAction
 } from "@/components/ui/alert-dialog.tsx";
+import {Input} from "@/components/ui/input.tsx"
 
 interface TrainCardProps {
     train: ITrain;
 }
 
+interface TrainModalProps {
+    modalMode: "confirmFinish" | "payerInput" | "stationInput" | null;
+    payer: string;
+    setPayer: (value: string) => void;
+    completeTrain: () => Promise<void>;
+    savePayer: () => Promise<void>;
+    onClose: () => void;
+}
+
+function TrainModal({
+                        modalMode,
+                        payer,
+                        setPayer,
+                        completeTrain,
+                        savePayer,
+                        onClose
+                    }: TrainModalProps) {
+    const [trainStation, setTrainStation] = useState<ITrainStation>();
+
+
+    const getHeaderContent = () => {
+        const getHeaderTitle = (title: string, desc: string) => {
+            return <>
+                <AlertDialogTitle>{title}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {desc}
+                </AlertDialogDescription>
+            </>
+        }
+        switch (modalMode) {
+            case "confirmFinish":
+                return (
+                    getHeaderTitle("Подтверждение", "Вы уверены, что хотите завершить эту тренировку?")
+                );
+            case "payerInput":
+                return (
+                    getHeaderTitle("Ввод плательщика", "Введите имя плательщика.")
+                );
+
+            case "stationInput":
+                return (
+                    getHeaderTitle("Добавление рабочей станции", "Заполните форму станции")
+                )
+            default:
+                return null;
+        }
+    }
+
+    const getBodyContent = () => {
+
+        switch (modalMode) {
+            case "payerInput":
+                return (
+                    <>
+                        <Input
+                            placeholder="Имя плательщика"
+                            value={payer}
+                            onChange={(e) => setPayer(e.target.value)}
+                        />
+                    </>
+                )
+            case "stationInput":
+                return (
+                    <>
+
+
+                    </>
+                )
+        }
+    }
+
+    return (
+        <AlertDialog open={!!modalMode} onOpenChange={onClose}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    {getHeaderContent()}
+                </AlertDialogHeader>
+
+                {modalMode === "payerInput" && (
+                    <Input
+                        placeholder="Имя плательщика"
+                        value={payer}
+                        onChange={(e) => setPayer(e.target.value)}
+                    />
+                )}
+
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Отмена</AlertDialogCancel>
+                    {modalMode === "confirmFinish" ? (
+                        <AlertDialogAction onClick={completeTrain}>Подтвердить</AlertDialogAction>
+                    ) : (
+                        <AlertDialogAction onClick={savePayer}>Сохранить</AlertDialogAction>
+                    )}
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+}
+
 function TrainCard({train}: TrainCardProps) {
     const [trainState, setTrain] = useState<ITrain>(train);
     const [payer, setPayer] = useState("");
-    const [modalMode, setModalMode] = useState<"confirmFinish" | "payerInput" | null>(null);
+    const [modalMode, setModalMode] = useState<"confirmFinish" | "payerInput" | "stationInput" | null>(null);
 
     const refreshTrain = async (id: number) => {
         try {
@@ -75,7 +174,8 @@ function TrainCard({train}: TrainCardProps) {
                             {trainState?.payedBy
                                 ||
                                 <Button size='sm' className={'text-sm'} onClick={() => {
-                                    setModalMode("payerInput")}}>
+                                    setModalMode("payerInput")
+                                }}>
                                     +
                                 </Button>}
                         </div>
@@ -107,48 +207,22 @@ function TrainCard({train}: TrainCardProps) {
                         </>
                     )}
                 </CardContent>
-                <CardFooter/>
+
+                <CardFooter>
+                    {trainState.status === "finished" ? <Button>
+                        Добавить тренажёр
+                    </Button> : ''}
+                </CardFooter>
             </Card>
 
-
-            <AlertDialog open={!!modalMode} onOpenChange={() => setModalMode(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        {modalMode === "confirmFinish" ? (
-                            <>
-                                <AlertDialogTitle>Подтверждение</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Вы уверены, что хотите завершить эту тренировку?
-                                </AlertDialogDescription>
-                            </>
-                        ) : (
-                            <>
-                                <AlertDialogTitle>Введите плательщика</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Введите имя плательщика.
-                                </AlertDialogDescription>
-                            </>
-                        )}
-                    </AlertDialogHeader>
-
-                    {modalMode === "payerInput" && (
-                        <Input
-                            placeholder="Имя плательщика"
-                            value={payer}
-                            onChange={(e) => setPayer(e.target.value)}
-                        />
-                    )}
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Отмена</AlertDialogCancel>
-                        {modalMode === "confirmFinish" ? (
-                            <AlertDialogAction onClick={completeTrain}>Подтвердить</AlertDialogAction>
-                        ) : (
-                            <AlertDialogAction onClick={savePayer}>Сохранить</AlertDialogAction>
-                        )}
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <TrainModal
+                modalMode={modalMode}
+                payer={payer}
+                setPayer={setPayer}
+                completeTrain={completeTrain}
+                savePayer={savePayer}
+                onClose={() => setModalMode(null)}
+            />
         </>
     );
 }

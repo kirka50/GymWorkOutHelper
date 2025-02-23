@@ -48,7 +48,7 @@ function CreateTrain() {
                     <div className={'text-center text-lg font-bold'}>Запланировать тренировку</div>
                     <div onClick={() => {
                         navigate(-1)
-                    }} className={'text-end'}>
+                    }} className={'text-end cursor-pointer'}>
                         Назад
                     </div>
                 </div>
