@@ -38,6 +38,7 @@ function TrainModal({
                         savePayer,
                         onClose
                     }: TrainModalProps) {
+    // @ts-ignore
     const [trainStation, setTrainStation] = useState<ITrainStation>();
 
 
@@ -68,7 +69,7 @@ function TrainModal({
                 return null;
         }
     }
-
+    // @ts-ignore
     const getBodyContent = () => {
 
         switch (modalMode) {
