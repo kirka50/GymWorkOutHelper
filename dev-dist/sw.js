@@ -94,13 +94,13 @@ define(['./workbox-54d0af47'], (function (workbox) { 'use strict';
     "revision": "2d94aa82a5e2c631dd2874d8c587ad65"
   }, {
     "url": "index.html",
-    "revision": "ac202fde1c53ea7adee3d37ae4279321"
+    "revision": "8554471233a29fc8c715dc8feec87e9a"
   }, {
     "url": "vite.svg",
     "revision": "8e3a10e157f75ada21ab742c022d5430"
   }, {
     "url": "index.html",
-    "revision": "0.99qdphct9rg"
+    "revision": "0.k49btvlso9"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {

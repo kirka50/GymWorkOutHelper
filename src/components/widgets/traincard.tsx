@@ -79,7 +79,7 @@ function TrainModal({
                             placeholder="Имя плательщика"
                             value={payer}
                             onChange={(e) => setPayer(e.target.value)}
-                        />
+                        /> 
                     </>
                 )
             case "stationInput":
