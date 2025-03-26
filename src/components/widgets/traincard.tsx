@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
-import {ITrain, ITrainStation} from "@/models/Train.model.ts";
+import {ITrain} from "@/models/Train.model.ts";
 import TrainStation from "@/components/cs/TrainStation.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {db} from "@/models/TrainDB.ts";
@@ -21,110 +21,74 @@ interface TrainCardProps {
     train: ITrain;
 }
 
-interface TrainModalProps {
-    modalMode: "confirmFinish" | "payerInput" | "stationInput" | null;
+export const ConfirmFinishModal = ({
+                                       open,
+                                       onClose,
+                                       onConfirm
+                                   }: {
+    open: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+}) => (
+    <AlertDialog open={open} onOpenChange={onClose}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Подтверждение</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Вы уверены, что хотите завершить эту тренировку?
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Отмена</AlertDialogCancel>
+                <AlertDialogAction onClick={onConfirm}>Подтвердить</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+);
+
+// Новый компонент PayerInputModal.tsx
+export const PayerInputModal = ({
+                                    open,
+                                    onClose,
+                                    payer,
+                                    setPayer,
+                                    onSave
+                                }: {
+    open: boolean;
+    onClose: () => void;
     payer: string;
     setPayer: (value: string) => void;
-    completeTrain: () => Promise<void>;
-    savePayer: () => Promise<void>;
-    onClose: () => void;
-}
-
-function TrainModal({
-                        modalMode,
-                        payer,
-                        setPayer,
-                        completeTrain,
-                        savePayer,
-                        onClose
-                    }: TrainModalProps) {
-    // @ts-ignore
-    const [trainStation, setTrainStation] = useState<ITrainStation>();
-
-
-    const getHeaderContent = () => {
-        const getHeaderTitle = (title: string, desc: string) => {
-            return <>
-                <AlertDialogTitle>{title}</AlertDialogTitle>
+    onSave: () => void;
+}) => (
+    <AlertDialog open={open} onOpenChange={onClose}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Ввод плательщика</AlertDialogTitle>
                 <AlertDialogDescription>
-                    {desc}
+                    Введите имя плательщика.
                 </AlertDialogDescription>
-            </>
-        }
-        switch (modalMode) {
-            case "confirmFinish":
-                return (
-                    getHeaderTitle("Подтверждение", "Вы уверены, что хотите завершить эту тренировку?")
-                );
-            case "payerInput":
-                return (
-                    getHeaderTitle("Ввод плательщика", "Введите имя плательщика.")
-                );
-
-            case "stationInput":
-                return (
-                    getHeaderTitle("Добавление рабочей станции", "Заполните форму станции")
-                )
-            default:
-                return null;
-        }
-    }
-    // @ts-ignore
-    const getBodyContent = () => {
-
-        switch (modalMode) {
-            case "payerInput":
-                return (
-                    <>
-                        <Input
-                            placeholder="Имя плательщика"
-                            value={payer}
-                            onChange={(e) => setPayer(e.target.value)}
-                        /> 
-                    </>
-                )
-            case "stationInput":
-                return (
-                    <>
-
-
-                    </>
-                )
-        }
-    }
-
-    return (
-        <AlertDialog open={!!modalMode} onOpenChange={onClose}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    {getHeaderContent()}
-                </AlertDialogHeader>
-
-                {modalMode === "payerInput" && (
-                    <Input
-                        placeholder="Имя плательщика"
-                        value={payer}
-                        onChange={(e) => setPayer(e.target.value)}
-                    />
-                )}
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    {modalMode === "confirmFinish" ? (
-                        <AlertDialogAction onClick={completeTrain}>Подтвердить</AlertDialogAction>
-                    ) : (
-                        <AlertDialogAction onClick={savePayer}>Сохранить</AlertDialogAction>
-                    )}
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-}
+            </AlertDialogHeader>
+            <Input
+                placeholder="Имя плательщика"
+                value={payer}
+                onChange={(e) => setPayer(e.target.value)}
+            />
+            <AlertDialogFooter>
+                <AlertDialogCancel>Отмена</AlertDialogCancel>
+                <AlertDialogAction onClick={onSave}>Сохранить</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+);
 
 function TrainCard({train}: TrainCardProps) {
     const [trainState, setTrain] = useState<ITrain>(train);
     const [payer, setPayer] = useState("");
-    const [modalMode, setModalMode] = useState<"confirmFinish" | "payerInput" | "stationInput" | null>(null);
+    const [modals, setModals] = useState({
+        confirmFinish: false,
+        payerInput: false,
+        stationInput: false,
+    });
 
     const refreshTrain = async (id: number) => {
         try {
@@ -141,14 +105,12 @@ function TrainCard({train}: TrainCardProps) {
         if (!trainState?.id) return;
         await db.setTrainFinished(trainState.id);
         await refreshTrain(trainState.id);
-        setModalMode(null);
     };
 
     const savePayer = async () => {
         if (!trainState?.id || !payer) return;
         await db.trainItem.update(trainState.id, {payedBy: payer});
         await refreshTrain(trainState.id);
-        setModalMode(null);
     };
 
     return (
@@ -175,7 +137,7 @@ function TrainCard({train}: TrainCardProps) {
                             {trainState?.payedBy
                                 ||
                                 <Button size='sm' className={'text-sm'} onClick={() => {
-                                    setModalMode("payerInput")
+                                    setModals((p => ({...p, payerInput: true})))
                                 }}>
                                     +
                                 </Button>}
@@ -190,9 +152,7 @@ function TrainCard({train}: TrainCardProps) {
                 </CardHeader>
                 <CardContent>
                     {trainState.status === "pending" && (
-                        <Button onClick={() => {
-                            setModalMode("confirmFinish")
-                        }} className="bg-green-500">
+                        <Button onClick={() => setModals(p => ({...p, confirmFinish: true}))} className="bg-green-500">
                             Завершить тренировку
                         </Button>
                     )}
@@ -215,14 +175,18 @@ function TrainCard({train}: TrainCardProps) {
                     </Button> : ''}
                 </CardFooter>
             </Card>
+            <ConfirmFinishModal
+                open={modals.confirmFinish}
+                onClose={() => setModals(p => ({...p, confirmFinish: false}))}
+                onConfirm={completeTrain}
+            />
 
-            <TrainModal
-                modalMode={modalMode}
+            <PayerInputModal
+                open={modals.payerInput}
+                onClose={() => setModals(p => ({...p, payerInput: false}))}
                 payer={payer}
                 setPayer={setPayer}
-                completeTrain={completeTrain}
-                savePayer={savePayer}
-                onClose={() => setModalMode(null)}
+                onSave={savePayer}
             />
         </>
     );
