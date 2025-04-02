@@ -42,7 +42,7 @@ function LatestTrain(
             </div>
             <div className={'mt-5 p-2'}>
                 {latestTrain ? (
-                    <Traincard train={latestTrain}/>
+                    <Traincard initTrain={latestTrain}/>
                 ) : (<p>Не удалось получить последнюю тренировку</p>)}
             </div>
         </div>
