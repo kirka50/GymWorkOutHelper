@@ -7,6 +7,7 @@ import ConfirmFinishModal from "@/components/cs/ConfirmFinishModal.tsx";
 import PayerInputModal from "@/components/cs/PayerInputModal.tsx";
 import {useTrainCard} from "@/hooks/useTrainCard.ts";
 import TrainHeaderMeta from "@/components/cs/TrainHeaderMeta.tsx";
+import AddTrainStationModal from "@/components/cs/AddTrainStationModal.tsx";
 
 interface TrainCardProps {
     initTrain: ITrain;
@@ -51,7 +52,10 @@ function TrainCard({initTrain}: TrainCardProps) {
                 </CardContent>
 
                 <CardFooter>
-                    {train.status === "finished" ? <Button>
+                    {train.status === "finished" ?
+                        <Button
+                            onClick={handlers.openTrainStationModal}
+                        >
                         Добавить тренажёр
                     </Button> : ''}
                 </CardFooter>
@@ -68,6 +72,12 @@ function TrainCard({initTrain}: TrainCardProps) {
                 payer={payer}
                 setPayer={setPayer}
                 onSave={handlers.savePayer}
+            />
+
+            <AddTrainStationModal
+                open={modals.addTrainStation}
+                onClose={closeModal("addTrainStation")}
+                onSave={handlers.handleTrainStationAdd}
             />
         </>
     );

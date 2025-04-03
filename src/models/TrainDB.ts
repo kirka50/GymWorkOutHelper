@@ -1,5 +1,5 @@
 import Dexie, {Table} from "dexie";
-import {ITrain} from "@/models/Train.model.ts";
+import {ITrain, ITrainStation} from "@/models/Train.model.ts";
 import {testData} from "@/models/testData.ts";
 
 
@@ -27,6 +27,17 @@ export class TrainDB extends Dexie{
     async addTrain(train: ITrain) {
         return this.transaction('rw', this.trainItem, async () => {
             return this.trainItem.add(train);
+        });
+    }
+
+    async addTrainStation(id: number, newStation: ITrainStation) {
+        return this.transaction('rw', this.trainItem, async () => {
+            const train = await this.trainItem.get(id);
+            if (!train) {
+                throw new Error(`Train with id ${id} not found`);
+            }
+            const updatedStationList = train.stationList ? [...train.stationList, newStation] : [newStation];
+            return this.trainItem.update(id, { stationList: updatedStationList });
         });
     }
 
