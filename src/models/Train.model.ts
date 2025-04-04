@@ -5,6 +5,7 @@ interface ITrain {
     payedBy?: string;
     status: "pending" | "finished" | "skipped";
     stationList?: ITrainStation[];
+    updatedAt: string;
 }
 
 interface ITrainStation {
