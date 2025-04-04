@@ -27,4 +27,4 @@ dist-ssr
 #custom
 
 dev-dist
-configs/fireBase.ts
+/src/configs/fireBase.ts
