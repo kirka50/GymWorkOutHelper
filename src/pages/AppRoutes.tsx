@@ -7,7 +7,7 @@ import CreateTrain from "@/pages/CreateTrain.tsx";
 function AppRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<LatestTrain />} />
+            <Route path="/GymWorkOutHelper/" element={<LatestTrain />} />
             <Route path="/CreateTrain" element={<CreateTrain/>}/>
         </Routes>
     )
