@@ -19,7 +19,6 @@ const manifest: Partial<ManifestOptions> | false = {
     "lang": "ru-RU",
     "name": "GymWorkOut helper",
     "short_name": "Gym helper",
-    "start_url": "/"
 }
 
 export default defineConfig({
