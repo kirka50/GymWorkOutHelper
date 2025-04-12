@@ -5,7 +5,7 @@ import  tailwindcss from '@tailwindcss/vite';
 import path from "path";
 
 const manifest: Partial<ManifestOptions> | false = {
-    "base": "/kirka50.github.io/",
+    "base": "/GymWorkOutHelper/",
     "theme_color": "#cf24ff",
     "background_color": "#fafafa",
     "icons": [{
