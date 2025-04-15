@@ -28,6 +28,7 @@ function CreateTrain() {
                     date: date?.toString(),
                     type: trainType,
                     status: 'pending',
+                    updatedAt: new Date().toString(),
                 }
             )
             setIsOpen(true);

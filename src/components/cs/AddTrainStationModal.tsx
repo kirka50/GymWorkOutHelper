@@ -8,14 +8,12 @@ import {
 import {Input} from "@/components/ui/input.tsx";
 import {useState} from "react";
 import {ITrainStation} from "@/models/Train.model.ts";
+import {useModals} from "@/components/cs/ModalsContext.tsx";
 
 function AddTrainStationModal({
-                                 open,
-                                 onClose,
+
                                 onSave
                              }: {
-    open: boolean;
-    onClose: () => void;
     onSave:(trainStatin: ITrainStation) => void
 }) {
     const [trainStation, setTrainStation] = useState<ITrainStation>(
@@ -26,9 +24,9 @@ function AddTrainStationModal({
             weight: '',
         }
     )
-
+    const {isModalOpen, closeModal} = useModals();
     return (
-        <AlertDialog open={open} onOpenChange={onClose}>
+        <AlertDialog open={isModalOpen('addTrainStation')} onOpenChange={() => closeModal("addTrainStation")}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Добавление тренажёра</AlertDialogTitle>

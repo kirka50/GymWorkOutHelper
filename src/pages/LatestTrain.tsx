@@ -1,7 +1,7 @@
 import {NavLink} from "react-router";
 import Traincard from "@/components/widgets/traincard.tsx";
 import {ITrain} from "@/models/Train.model.ts";
-import {useEffect, useState} from "react";
+import {memo, useEffect, useState} from "react";
 import {db} from "@/models/TrainDB.ts";
 
 
@@ -24,7 +24,11 @@ function LatestTrain(
         getLastItem();
     }, []);
 
-
+    const CreateTrainLink = memo(() => (
+        <NavLink to="/CreateTrain">
+            Запланировать тренировку
+        </NavLink>
+    ));
     return(
         <div>
             <div className={'border-b-2 border-gray-200'}>
@@ -34,17 +38,15 @@ function LatestTrain(
                     </div>
                     <div className={'text-center text-lg font-bold'}>Последняя тренировка</div>
                     <div className={'text-end'}>
-                        <NavLink to={'/CreateTrain'}>
-                            Запланировать тренировку
-                        </NavLink>
+                        <CreateTrainLink />
                     </div>
                 </div>
             </div>
-            <div className={'mt-5 p-2'}>
-                {latestTrain ? (
-                    <Traincard initTrain={latestTrain}/>
-                ) : (<p>Не удалось получить последнюю тренировку</p>)}
-            </div>
+                <div className={'mt-5 p-2'}>
+                    {latestTrain ? (
+                        <Traincard initTrain={latestTrain}/>
+                    ) : (<p>Не удалось получить последнюю тренировку</p>)}
+                </div>
         </div>
     )
 }

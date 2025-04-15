@@ -3,10 +3,11 @@ import {Separator} from "@/components/ui/separator.tsx";
 import {ITrain} from "@/models/Train.model.ts";
 import TrainStation from "@/components/cs/TrainStation.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import ConfirmFinishModal from "@/components/cs/ConfirmFinishModal.tsx";
-import PayerInputModal from "@/components/cs/PayerInputModal.tsx";
 import {useTrainCard} from "@/hooks/useTrainCard.ts";
 import TrainHeaderMeta from "@/components/cs/TrainHeaderMeta.tsx";
+import ConfirmFinishModal from "@/components/cs/ConfirmFinishModal.tsx";
+import PayerInputModal from "@/components/cs/PayerInputModal.tsx";
+import {ModalsProvider} from "@/components/cs/ModalsContext.tsx";
 import AddTrainStationModal from "@/components/cs/AddTrainStationModal.tsx";
 
 interface TrainCardProps {
@@ -17,12 +18,12 @@ interface TrainCardProps {
 function TrainCard({initTrain}: TrainCardProps) {
     const {
         train,
-        modals,
-        setPayer,
-        payer,
         handlers,
-        closeModal,
+        modals,
+        openModal,
+        closeModal
     } = useTrainCard(initTrain);
+
 
     return (
         <>
@@ -30,11 +31,11 @@ function TrainCard({initTrain}: TrainCardProps) {
                 <CardHeader>
                     <CardTitle>Тренировка от {new Date(train.date).toLocaleString()}</CardTitle>
                     <CardDescription>Тренировка с id: {train.id}</CardDescription>
-                    <TrainHeaderMeta train={train} onPayerClick={handlers.openPayerModal}/>
+                    <TrainHeaderMeta train={train} onPayerClick={() => openModal("payerInput")}/>
                 </CardHeader>
                 <CardContent>
                     {train.status === "pending" && (
-                        <Button onClick={handlers.openConfirmModal} className="bg-green-500">
+                        <Button onClick={() => openModal("confirmFinish")} className="bg-green-500">
                             Завершить тренировку
                         </Button>
                     )}
@@ -54,31 +55,18 @@ function TrainCard({initTrain}: TrainCardProps) {
                 <CardFooter>
                     {train.status === "finished" ?
                         <Button
-                            onClick={handlers.openTrainStationModal}
+                            onClick={() => openModal("addTrainStation")}
                         >
-                        Добавить тренажёр
-                    </Button> : ''}
+                            Добавить тренажёр
+                        </Button> : ''}
                 </CardFooter>
             </Card>
-            <ConfirmFinishModal
-                open={modals.confirmFinish}
-                onClose={closeModal("confirmFinish")}
-                onConfirm={handlers.completeTrain}
-            />
-
-            <PayerInputModal
-                open={modals.payerInput}
-                onClose={closeModal('payerInput')}
-                payer={payer}
-                setPayer={setPayer}
-                onSave={handlers.savePayer}
-            />
-
-            <AddTrainStationModal
-                open={modals.addTrainStation}
-                onClose={closeModal("addTrainStation")}
-                onSave={handlers.handleTrainStationAdd}
-            />
+            {/*TODO Надо сделать нормальную условную отрисовку*/}
+            <ModalsProvider modals={modals} closeModal={closeModal}>
+                <ConfirmFinishModal onConfirm={handlers.completeTrain}/>
+                <PayerInputModal onSave={handlers.savePayer}/>
+                <AddTrainStationModal onSave={handlers.handleTrainStationAdd}/>
+            </ModalsProvider>
         </>
     );
 }

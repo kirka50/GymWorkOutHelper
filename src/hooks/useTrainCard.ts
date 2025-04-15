@@ -1,16 +1,28 @@
 import {ITrain, ITrainStation} from "@/models/Train.model.ts";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {db} from "@/models/TrainDB.ts";
 
+export type ModalType =
+    | 'confirmFinish'
+    | 'payerInput'
+    | 'addTrainStation';
 
 export const useTrainCard = (initTrain:ITrain) => {
     const [train, setTrain] = useState<ITrain>(initTrain);
-    const [payer, setPayer] = useState('');
-    const [modals, setModals] = useState({
+
+    const [modals, setModals] = useState<Record<ModalType, boolean>>({
         confirmFinish: false,
         payerInput: false,
         addTrainStation: false,
     });
+
+    const openModal = useCallback((type: ModalType) => {
+        setModals(prev => ({ ...prev, [type]: true }));
+    }, []);
+
+    const closeModal = useCallback((type: ModalType) => {
+        setModals(prev => ({ ...prev, [type]: false }));
+    }, []);
 
 
     const refreshTrain = async (id: number) => {
@@ -28,7 +40,7 @@ export const useTrainCard = (initTrain:ITrain) => {
         await refreshTrain(train.id);
     };
 
-    const handleSavePayer = async () => {
+    const handleSavePayer = async (payer:string) => {
         if (!train?.id || !payer) return;
         await db.trainItem.update(train.id, { payedBy: payer });
         await refreshTrain(train.id);
@@ -38,31 +50,18 @@ export const useTrainCard = (initTrain:ITrain) => {
         if (!train?.id) return;
         await db.addTrainStation(train.id, trainStation)
         await refreshTrain(train.id)
-    }
-
-    const openModal = (modal: keyof typeof modals) => () => {
-        setModals(prev => ({ ...prev, [modal]: true }));
     };
-
-    const closeModal = (modal: keyof typeof modals) => () => {
-        setModals(prev => ({ ...prev, [modal]: false }));
-    };
-
 
 
     return {
         train,
-        modals,
-        payer,
-        setPayer,
+        modals: modals,
         handlers: {
             handleTrainStationAdd: handleTrainStationAdd,
             completeTrain: handleCompleteTrain,
             savePayer: handleSavePayer,
-            openConfirmModal: openModal("confirmFinish"),
-            openPayerModal: openModal("payerInput"),
-            openTrainStationModal: openModal("addTrainStation"),
         },
-        closeModal,
+        openModal: openModal,
+        closeModal: closeModal,
     };
 }

@@ -6,22 +6,18 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {Input} from "@/components/ui/input.tsx";
+import {memo, useState} from "react";
+import {useModals} from "@/components/cs/ModalsContext.tsx";
 
-function PayerInputModal({
-                                    open,
-                                    onClose,
-                                    payer,
-                                    setPayer,
+const PayerInputModal = memo(({
                                     onSave
                                 }: {
-    open: boolean;
-    onClose: () => void;
-    payer: string;
-    setPayer: (value: string) => void;
-    onSave: () => void;
-}) {
+    onSave: (payer:string) => void;
+}) =>{
+    const [payer, setPayer] = useState('')
+    const {isModalOpen, closeModal} = useModals();
     return (
-        <AlertDialog open={open} onOpenChange={onClose}>
+        <AlertDialog open={isModalOpen('payerInput')} onOpenChange={() => closeModal("payerInput")}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Ввод плательщика</AlertDialogTitle>
@@ -36,11 +32,11 @@ function PayerInputModal({
                 />
                 <AlertDialogFooter>
                     <AlertDialogCancel>Отмена</AlertDialogCancel>
-                    <AlertDialogAction onClick={onSave}>Сохранить</AlertDialogAction>
+                    <AlertDialogAction onClick={() => {onSave(payer)}}>Сохранить</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
     );
-}
+})
 
 export default PayerInputModal;

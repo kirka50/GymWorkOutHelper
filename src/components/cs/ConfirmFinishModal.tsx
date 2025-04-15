@@ -5,18 +5,18 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
+import {useModals} from "@/components/cs/ModalsContext.tsx";
+import {memo} from "react";
 
-function ConfirmFinishModal({
-                                       open,
-                                       onClose,
-                                       onConfirm
-                                   }: {
-    open: boolean;
-    onClose: () => void;
+const ConfirmFinishModal = memo(({
+
+                                onConfirm
+                            }: {
     onConfirm: () => void;
-}){
-   return (
-        <AlertDialog open={open} onOpenChange={onClose}>
+}) => {
+    const {isModalOpen, closeModal} = useModals();
+    return (
+        <AlertDialog open={isModalOpen('confirmFinish')} onOpenChange={() => {closeModal("confirmFinish")}}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Подтверждение</AlertDialogTitle>
@@ -31,6 +31,6 @@ function ConfirmFinishModal({
             </AlertDialogContent>
         </AlertDialog>
     );
-}
+})
 
 export default ConfirmFinishModal;
